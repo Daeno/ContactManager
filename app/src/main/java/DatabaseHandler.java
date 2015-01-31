@@ -1,7 +1,9 @@
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
 
 import contactmanager.intracode.org.contactmanager.Contact;
 
@@ -59,4 +61,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
     }
 
+    public Contact getContact(int id) {
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_CONTACTS,
+                new String[] {KEY_ID, KEY_NAME, KEY_PHONE, KEY_EMAIL, KEY_ADDRESS, KEY_IMAGEURI},
+                KEY_ID + "=?", new String[] {String.valueOf(id)}, null, null, null);
+
+        if (cursor != null)
+            cursor.moveToFirst();
+
+        Contact contact = new Contact(Integer.parseInt(cursor.getString(0)),
+                cursor.getString(1),
+                cursor.getString(2),
+                cursor.getString(3),
+                cursor.getString(4),
+                Uri.parse(cursor.getString(5)));
+        db.close();
+        cursor.close();
+        return contact;
+    }
 }
